@@ -1,11 +1,13 @@
 import axios from "axios";
 import { useState } from "react"
 import { Variables } from "../../config/env-loader";
+import { useCookies } from "react-cookie";
 
 function Login(){
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [_, setCookie] = useCookies(['user']);
     
     const emailOnChange = (event: { target: { name: any; value: any; }; }) => {
         const { value } = event.target;
@@ -20,12 +22,10 @@ function Login(){
     const login = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const data = { email, password }
-        console.log(data)
         const request = await axios.post(Variables.VITE_CHAT_API_URL+'/auth/login', data)
         const res = request.data
         if(res.statusCode == 200){
-            console.log(res)
-            localStorage.setItem('user', res.data)
+            setCookie('user', res.data, { path: '/' })
             // TODO change to proper router
             window.location.replace('/view/home/');
         }else{
