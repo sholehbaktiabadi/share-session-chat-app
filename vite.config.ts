@@ -27,9 +27,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(root, 'index.html'),
-        // about: resolve(root, 'view', 'about', 'index.html'),
-        // service: resolve(root, 'view', 'service', 'index.html'),
-        // contact: resolve(root, 'view', 'contact', 'index.html'),
+        login: resolve(root, 'view', 'login', 'index.html'),
+        home: resolve(root, 'view', 'home', 'index.html'),
+        room: resolve(root, 'view', 'room', 'index.html'),
       }
     }
   }
