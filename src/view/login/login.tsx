@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react"
+import { Variables } from "../../config/env-loader";
 
 function Login(){
 
@@ -20,7 +21,7 @@ function Login(){
         e.preventDefault();
         const data = { email, password }
         console.log(data)
-        const request = await axios.post('http://localhost:5001/auth/login', data)
+        const request = await axios.post(Variables.VITE_CHAT_API_URL+'/auth/login', data)
         const res = request.data
         if(res.statusCode == 200){
             console.log(res)
