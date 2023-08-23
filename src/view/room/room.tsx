@@ -4,6 +4,7 @@ import { Variables } from "../../config/env-loader"
 import { useCookies } from "react-cookie";
 import jwtDecode from "jwt-decode"
 import { UserToken } from "../../types/user";
+import io from 'socket.io-client'
 
 interface SocketChannel { event?: string }
 function Room(props: SocketChannel){
@@ -12,11 +13,16 @@ function Room(props: SocketChannel){
     const [cookies] = useCookies(['user']);
     const [userCookies] = useState(cookies.user)
     const user: UserToken = jwtDecode(userCookies)
-    console.log(user.id)
+    // const app = socket({ host: 'http://localhost:3001', transports: ["websocket"], reconnectionDelayMax: 10000, reconnectionAttempts: 1 })
     useEffect(()=> {
+        const app = io('http://localhost:3001')
+        app.on('M2Y3Zjk4NjItZjQyOC00YWJkLTk3NjItODU2YzAyZDFkNzhkLXNlcGFyYXRvci00NzAzNTdjYi03ZjUzLTQxZGYtYjc3ZC1hNzM4N2I2NmJlMTg=', (data)=> setMessage(prevData=> [...prevData, data])) 
         axios.get(Variables.VITE_CHAT_API_URL+'/message/channel', { params: { event: event }, headers: { Authorization: `Bearer ${cookies.user}` } })
-        .then(res => {console.log(res.data); setMessage(res.data.data)})
+        .then(res => setMessage(res.data.data))
         .catch(err => console.log(err))
+        return ()=> {
+            app.disconnect()
+        }
     },[])
     return(
         <>
