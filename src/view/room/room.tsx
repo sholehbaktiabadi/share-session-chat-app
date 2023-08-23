@@ -5,19 +5,20 @@ import { useCookies } from "react-cookie";
 import jwtDecode from "jwt-decode"
 import { UserToken } from "../../types/user";
 import io from 'socket.io-client'
+import _ from 'lodash'
 
 interface SocketChannel { event?: string }
 function Room(props: SocketChannel){
     const [message, setMessage] = useState([{ id: '', msg: '', event: '', sender: '' }])
-    const event = props.event ?? 'M2Y3Zjk4NjItZjQyOC00YWJkLTk3NjItODU2YzAyZDFkNzhkLXNlcGFyYXRvci00NzAzNTdjYi03ZjUzLTQxZGYtYjc3ZC1hNzM4N2I2NmJlMTg='
+    const [event] = useState(props.event ?? 'MDgyMjMxODE3MTczLXNlcGFyYXRvci0wODIyMzE4MTcxNzQ=')
     const [cookies] = useCookies(['user']);
     const [userCookies] = useState(cookies.user)
     const user: UserToken = jwtDecode(userCookies)
     const [msg, setMsg] = useState('')
 
     useEffect(()=> {
-        const app = io('http://localhost:3001')
-        app.on('M2Y3Zjk4NjItZjQyOC00YWJkLTk3NjItODU2YzAyZDFkNzhkLXNlcGFyYXRvci00NzAzNTdjYi03ZjUzLTQxZGYtYjc3ZC1hNzM4N2I2NmJlMTg=', (data)=> setMessage(prevData=> [...prevData, data])) 
+        const app = io(Variables.VITE_SOCKETIO_HOST)
+        app.on(event, (data)=> setMessage(prevData=> [...prevData, data])) 
         axios.get(Variables.VITE_CHAT_API_URL+'/message/channel', { params: { event: event }, headers: { Authorization: `Bearer ${cookies.user}` } })
         .then(res => setMessage(res.data.data))
         .catch(err => console.log(err))
@@ -28,9 +29,14 @@ function Room(props: SocketChannel){
 
     const submitMessage = async (e: React.FormEvent<HTMLFormElement>) =>{
         e.preventDefault()
-        axios.post(Variables.VITE_CHAT_API_URL+'/message', { msg: msg, phone: "082231817175" }, { headers: { Authorization: `Bearer ${cookies.user}` } })
+        const decodeBase64 = atob(event)
+        const userBucket = decodeBase64.split('-separator-')
+        const [target] = _.map(_.difference(userBucket, [user.phone]), (unmatchedPhone) => _.indexOf(userBucket, unmatchedPhone));
+        console.log(target, userBucket)
+        axios.post(Variables.VITE_CHAT_API_URL+'/message', { msg: msg, phone: userBucket[target] }, { headers: { Authorization: `Bearer ${cookies.user}` } })
         .then(res => console.log(res.data.data))
         .catch(err => console.log(err))
+        setMsg('')
     }
 
     const onChangeMsg= (event: { target: { name: any; value: any; }; }) => {
@@ -45,14 +51,14 @@ function Room(props: SocketChannel){
                     <div className="col-6">
                     <ul className="list-group list-group-flush">
                     { message.map((res) => 
-                    res.sender == user.id ?  <li className="list-group-item" key={res.id}> <p>{res.msg}</p> </li> : <li className="list-group-item text-end" key={res.id}> <p>{res.msg}</p> </li>
+                    res.sender == user.id ?  <li className="list-group-item text-end" key={res.id}> <p>{res.msg}</p> </li> : <li className="list-group-item" key={res.id}> <p>{res.msg}</p> </li>
                     ) }
                     </ul>
                     <div className="row justify-content-center align-items-center">
                     <form onSubmit={submitMessage}>
                     <div className="col">
                         <div className="mb-3">
-                        <textarea className="form-control" id="exampleFormControlTextarea1" name="message" onChange={onChangeMsg} rows={3}></textarea>
+                        <textarea className="form-control" id="exampleFormControlTextarea1" name="message" value={msg} onChange={onChangeMsg} rows={3}></textarea>
                         </div>
                     </div>
                     <div className="col">
