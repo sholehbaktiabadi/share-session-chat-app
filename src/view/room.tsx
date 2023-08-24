@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Variables } from "../../config/env-loader";
 import { useCookies } from "react-cookie";
 import jwtDecode from "jwt-decode";
-import { UserToken } from "../../types/user";
 import io from "socket.io-client";
+import { Variables } from "../config/env-loader";
+import { UserToken } from "../types/user";
 import _ from "lodash";
 
 interface SocketChannel {

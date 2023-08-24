@@ -24,13 +24,13 @@ export default defineConfig({
   build: {
     outDir,
     emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        main: resolve(root, 'index.html'),
-        login: resolve(root, 'view', 'login', 'index.html'),
-        home: resolve(root, 'view', 'home', 'index.html'),
-        room: resolve(root, 'view', 'room', 'index.html'),
-      }
-    }
+    // rollupOptions: {
+    //   input: {
+    //     main: resolve(root, 'index.html'),
+    //     login: resolve(root, 'view', 'login', 'index.html'),
+    //     home: resolve(root, 'view', 'home', 'index.html'),
+    //     room: resolve(root, 'view', 'room', 'index.html'),
+    //   }
+    // }
   }
 })
