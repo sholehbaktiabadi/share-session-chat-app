@@ -30,7 +30,6 @@ function Login() {
     const res = request.data;
     if (res.statusCode == 200) {
       setCookie("user", res.data, { path: "/" });
-      setInterval((x: any)=> x,1000)
       navigate("/home");
     } else {
       return;

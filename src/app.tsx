@@ -10,7 +10,7 @@ import { Variables } from "./config/env-loader";
 
 function App() {
   const [token] = useCookies(["user"]);
-  const [isAuthenticated, setAuthenticated] = useState(false);
+  const [isAuthenticated, setAuthenticated] = useState(true);
   useEffect(() => {
     axios
       .post(
