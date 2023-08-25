@@ -31,7 +31,7 @@ function App() {
         <Route path="/" element={isAuthenticated ? <Landing /> : <Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={isAuthenticated ? <Home /> : <Login />} />
-        <Route path="/room" element={isAuthenticated ? <Room /> : <Login />} />
+        <Route path="/room/:ch" element={isAuthenticated ? <Room /> : <Login />} />
       </Routes>
     </BrowserRouter>
   );

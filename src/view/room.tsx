@@ -6,16 +6,16 @@ import io from "socket.io-client";
 import { Variables } from "../config/env-loader";
 import { UserToken } from "../types/user";
 import _ from "lodash";
+import { useParams } from "react-router-dom";
 
-interface SocketChannel {
-  event?: string;
-}
-function Room(props: SocketChannel) {
+
+function Room() {
+  const { ch } = useParams()
   const [message, setMessage] = useState([
     { id: "", msg: "", event: "", sender: "" },
   ]);
   const [event] = useState(
-    props.event ?? "MDgyMjMxODE3MTczLXNlcGFyYXRvci0wODIyMzE4MTcxNzQ="
+    ch
   );
   const [cookies] = useCookies(["user"]);
   const [userCookies] = useState(cookies.user);
@@ -24,13 +24,13 @@ function Room(props: SocketChannel) {
 
   useEffect(() => {
     const app = io(Variables.VITE_SOCKETIO_HOST);
-    app.on(event, (data) => setMessage((prevData) => [...prevData, data]));
+    app.on(ch as string, (data) => setMessage((prevData) => [...prevData, data]));
     axios
       .get(Variables.VITE_CHAT_API_URL + "/message/channel", {
         params: { event: event },
         headers: { Authorization: `Bearer ${cookies.user}` },
       })
-      .then((res) => setMessage(res.data.data))
+      .then((res) => {setMessage(res.data.data); console.log(ch)})
       .catch((err) => console.log(err));
     return () => {
       app.disconnect();
@@ -39,7 +39,7 @@ function Room(props: SocketChannel) {
 
   const submitMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const decodeBase64 = atob(event);
+    const decodeBase64 = atob(ch as string);
     const userBucket = decodeBase64.split("-separator-");
     const [target] = _.map(
       _.difference(userBucket, [user.phone]),
